@@ -55,4 +55,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for how to add a new skill, and the [Code
 
 ## License
 
-Apache License 2.0 — see [LICENSE](LICENSE).
+Apache License 2.0 — see [LICENSE](LICENSE.txt).
