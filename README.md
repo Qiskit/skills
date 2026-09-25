@@ -20,11 +20,33 @@ Install using the [plugin marketplace](https://code.claude.com/docs/en/discover-
 
 ### Codex, Cursor, and other Agent Skills–compatible agents
 
-The skills in this repo follow the open [Agent Skills specification](https://agentskills.io), which several agent CLIs read directly. Clone the repo and point your agent at it, or copy the relevant `skills/<name>/` folder into wherever your agent looks for skills (see your agent's own docs for its exact directory and marketplace/install mechanics — this repo also ships `.codex-plugin/` and `.cursor-plugin/` manifests for tools that support plugin marketplaces).
+The skills in this repo follow the open [Agent Skills specification](https://agentskills.io), which several agent CLIs read directly.
+
+The easiest way to install is with the [Skills CLI](https://github.com/vercel-labs/skills):
+
+```
+npx skills add Qiskit/skills
+```
+
+This will prompt you to pick which agent(s) to install for and whether to install globally or just for the current project.
+
+To install a single skill instead of all of them:
+
+```
+npx skills add Qiskit/skills --skill migrate-qiskit-ibm-runtime
+```
+
+Alternatively, clone the repo and point your agent at it, or copy the relevant `skills/<name>/` folder into wherever your agent looks for skills (see your agent's own docs for its exact directory and marketplace/install mechanics — this repo also ships `.codex-plugin/` and `.cursor-plugin/` manifests for tools that support plugin marketplaces).
 
 ### IBM Bob
 
 Bob has no plugin/marketplace step — it reads `SKILL.md` files directly from `.bob/skills/` in a cloned project. This repo already symlinks `.bob/skills/<name>` back to the canonical `skills/<name>`, so cloning the repo is sufficient; Bob will pick up both skills automatically.
+
+You can also install with the [Skills CLI](https://github.com/vercel-labs/skills), targeting Bob directly:
+
+```
+npx skills add Qiskit/skills --agent bob
+```
 
 ### Clone / Copy
 
