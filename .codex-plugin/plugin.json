@@ -1,0 +1,20 @@
+{
+  "name": "qiskit-ai-skills",
+  "version": "0.1.0",
+  "description": "Agent skills for assisting Qiskit-based quantum computing workflows.",
+  "type": "object",
+  "author": {
+    "name": "Qiskit"
+  },
+  "repository": "https://github.com/Qiskit/skills",
+  "license": "Apache-2.0",
+  "keywords": [
+    "qiskit",
+    "quantum-computing",
+    "quantum-workflows",
+    "IBM-Quantum",
+    "agents",
+    "error-mitigation"
+  ],
+  "skills": "./skills/"
+}

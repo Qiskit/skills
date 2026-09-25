@@ -1,0 +1,20 @@
+{
+  "name": "qiskit-ai-skills",
+  "interface": {
+    "displayName": "Qiskit AI Skills"
+  },
+  "plugins": [
+    {
+      "name": "qiskit-ai-skills",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/Qiskit/skills.git"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}

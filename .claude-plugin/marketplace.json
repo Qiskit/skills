@@ -1,0 +1,14 @@
+{
+  "name": "qiskit-ai-skills",
+  "owner": {
+    "name": "Qiskit"
+  },
+  "plugins": [
+    {
+      "name": "qiskit-ai-skills",
+      "source": "./",
+      "description": "Agent skills for assisting Qiskit-based quantum computing workflows.",
+      "version": "0.1.0"
+    }
+  ]
+}
