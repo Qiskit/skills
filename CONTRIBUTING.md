@@ -1,8 +1,8 @@
 # Contributing
 
-This repo collects skills, commands, and other agent-harness artifacts for
-quantum-computing research workflows, along with the test workloads and run
-transcripts used to evaluate them, and notes on what works.
+This repo collects Agent Skills for IBM Quantum and Qiskit quantum-computing workflows,
+packaged so that Claude Code, IBM Bob, Codex, Cursor, and other Agent
+Skills-compatible agents can load them directly.
 
 ## Before you start
 
@@ -94,12 +94,32 @@ same directory, as plain files — not as nested commands.
 
 If the skill's job is to select from among several structured options (a
 decision-matrix problem, like picking an error mitigation strategy), consider
-the registry + capability-page pattern.
+splitting it into a registry plus one page per option: `SKILL.md` holds the
+decision procedure and a compact table of the available options with just
+enough detail to choose between them, and each option gets its own reference
+file with the full details (when it applies, prerequisites, parameters,
+worked usage). That keeps the always-loaded part small while letting the agent
+read only the page for the option it picked.
 
 ## Testing
 
-Once you've made a code change, it is important to verify that your change
-does not break any existing tests and that any new tests that you've added
-also run successfully. Before you open a new pull request for your change,
-you'll want to make sure the changes you made are well tested and be able
-to show proof of that in the PR.
+There is no automated test suite for this repo. Skills are prose, and what
+matters is whether an agent loads the right skill and then does the right
+thing with it. So "tested" here means you have exercised the skill end to end
+with a real agent and can show it.
+
+Before opening a pull request, check by hand that:
+
+* the skill's `description` causes the agent to load it for the requests it is
+  meant to cover, and *not* for adjacent requests it should stay out of;
+* the guidance is correct against the current library version, and any code the
+  agent produces by following it actually runs;
+* any supporting reference files the skill points at exist and are reachable
+  from `SKILL.md`.
+
+In the pull request description, say which agent and version you tried it with
+and include the prompts you used, plus a short transcript excerpt (or a
+screenshot) showing the skill firing and the result. Maintainers also run these
+skills against internal Qiskit evaluation workloads before release; those
+workloads and their transcripts are not public, so a reviewer may report a
+failure you cannot reproduce locally and will describe the case for you.
