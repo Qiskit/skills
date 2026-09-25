@@ -14,8 +14,8 @@ A collection of [Agent Skills](https://www.anthropic.com/engineering/equipping-a
 Install using the [plugin marketplace](https://code.claude.com/docs/en/discover-plugins#add-from-github):
 
 ```
-/plugin marketplace add Qiskit/qiskit-ai-skills
-/plugin install qiskit-ai-skills@qiskit-ai-skills
+/plugin marketplace add Qiskit/skills
+/plugin install qiskit-ai-skills@qiskit
 ```
 
 ### Codex, Cursor, and other Agent Skills–compatible agents
