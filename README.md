@@ -2,14 +2,50 @@
 
 **Official, IBM-verified Agent Skills for Claude Code, IBM Bob, and other coding agents.**
 
-[![License](https://img.shields.io/github/license/Qiskit/qiskit-ibm-runtime.svg?style=popout-square)](https://opensource.org/licenses/Apache-2.0)
+[![License](https://img.shields.io/github/license/Qiskit/skills.svg?style=popout-square)](https://opensource.org/licenses/Apache-2.0)
 [![Agent Skills Spec](https://img.shields.io/badge/Agent%20Skills-Specification-blue)](https://agentskills.io)
 
 A collection of [Agent Skills](https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills) for assisting Qiskit-based quantum workflows.
 
-## Installing
+## Skills
 
-### Claude Code
+Skills are contextual and auto-loaded based on your conversation. When a request matches a skill's triggers, the agent loads and applies the relevant skill to provide accurate, grounded guidance rather than relying on general knowledge that may be outdated.
+
+| Skill | Useful for |
+|-------|------------|
+| `migrate-qiskit-ibm-runtime` | Migrating qiskit-ibm-runtime code from an older release to the most recent one. |
+
+## Installation
+
+These skills follow the [Agent Skills](https://agentskills.io/) standard and can
+be installed into compatible AI coding agents using the [skills CLI](https://github.com/vercel-labs/skills), through
+native agent plugin marketplaces, or by cloning the repo.
+
+### Quick start
+
+The easiest way to install is with the [skills CLI](https://github.com/vercel-labs/skills):
+
+```
+npx skills add Qiskit/skills
+```
+
+This will prompt you to pick which agent(s) to install for and whether to install globally or just for the current project.
+
+**Install a specific skill:**
+
+```
+npx skills add Qiskit/skills --skill skill-to-install
+```
+
+**Keep installed skills current:**
+
+```
+npx skills update
+```
+
+### Install as a plugin
+
+#### Claude Code
 
 Install using the [plugin marketplace](https://code.claude.com/docs/en/discover-plugins#add-from-github):
 
@@ -18,34 +54,39 @@ Install using the [plugin marketplace](https://code.claude.com/docs/en/discover-
 /plugin install qiskit-ai-skills@qiskit
 ```
 
-### Codex, Cursor, and other Agent Skills–compatible agents
+#### Codex
 
-The skills in this repo follow the open [Agent Skills specification](https://agentskills.io), which several agent CLIs read directly. Clone the repo and point your agent at it, or copy the relevant `skills/<name>/` folder into wherever your agent looks for skills (see your agent's own docs for its exact directory and marketplace/install mechanics — this repo also ships `.codex-plugin/` and `.cursor-plugin/` manifests for tools that support plugin marketplaces).
+```
+codex plugin marketplace add Qiskit/skills
+codex plugin add qiskit-ai-skills@qiskit
+```
 
-### IBM Bob
+#### Cursor
 
-Bob has no plugin/marketplace step — it reads `SKILL.md` files directly from `.bob/skills/` in a cloned project. This repo already symlinks `.bob/skills/<name>` back to the canonical `skills/<name>`, so cloning the repo is sufficient; Bob will pick up both skills automatically.
+Install from the Cursor marketplace if available, or use the [Skills CLI](https://github.com/vercel-labs/skills) above with `--agent cursor`. See [Cursor plugins docs](https://cursor.com/docs/plugins) for more information.
+
+#### IBM Bob
+
+Bob has no plugin/marketplace step — it reads `SKILL.md` files directly from `.bob/skills/` in a cloned project. This repo already symlinks `.bob/skills/<name>` back to the canonical `skills/<name>`, so cloning the repo is sufficient.
+
+You can also install with the [Skills CLI](https://github.com/vercel-labs/skills) above with `--agent bob`.
 
 ### Clone / Copy
 
-Clone this repo and copy the skill folders into the appropriate directory for your agent:
+If your agent does not support a native plugin or the skills CLI, clone this repo and copy the desired skill directory to the agent's supported skill directory:
 
-| Agent | Skill Directory |
-|-------|-----------------|
-| Claude Code | `~/.claude/skills/` |
-| Cursor | `~/.cursor/skills/` |
-| IBM Bob | `.bob/skills/` (project) or `~/.bob/skills/` (global) |
+| Agent | Skill Directory | Docs |
+|-------|-----------------| ----- |
+| Claude Code | `~/.claude/skills/` | [docs](https://code.claude.com/docs/en/skills)
+| Codex | `~/.codex/skills/` | [docs](https://developers.openai.com/codex/skills)
+| Cursor | `~/.cursor/skills/` | [docs](https://cursor.com/docs/context/skills)
+| IBM Bob | `.bob/skills/` | [docs](https://bob.ibm.com/docs/ide/features/skills)
 
-## Skills
 
-Skills are contextual and auto-loaded based on your conversation. When a request matches a skill's triggers, the agent loads and applies the relevant skill to provide accurate, grounded guidance rather than relying on general knowledge that may be outdated.
+## Contributing
 
-| Skill | Useful for |
-|-------|------------|
-| `migrate-qiskit-ibm-runtime` | Migrating qiskit-ibm-runtime code from an older release to the most recent one. Note that this doesn't currently include `backend.run()` migration. |
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for how to add a new skill, test workload, or write-up.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for how to add a new skill, and the [Code of Conduct](CODE_OF_CONDUCT.md) for the expectations we hold each other to.
 
 ## License
 
-Apache License 2.0 — see [LICENSE.txt](LICENSE.txt).
+Apache License 2.0 — see [LICENSE](LICENSE.txt).
