@@ -240,11 +240,14 @@ rewritten — never against the original code to conclude the migration failed.
   `EstimatorV2` classes are **deprecated** and
   constructing one emits a `DeprecationWarning` naming `qiskit_ibm_runtime.executor_sampler.Sampler`
   / `qiskit_ibm_runtime.executor_estimator.Estimator` as the replacement. If that warning appears
-  while verifying, a hop-B usage was missed — unlike the local-testing-mode options warning below,
-  this one is **actionable**: find the remaining server-side construction and migrate it.
+  while verifying, a hop-B usage was missed: find the remaining server-side construction and migrate
+  it. The "have no effect in local testing mode" options warning below means the same thing.
 - **Option paths are valid.** For any options the code sets, construct the primitive against a fake
-  backend (e.g. `SamplerV2(mode=FakeKingston(), options=...)`) and run a small circuit through it to
-  catch renamed/invented attributes before the user hits them at run time.
+  backend (e.g. `SamplerV2(mode=FakeManilaV2(), options=...)`) and run a small circuit through it to
+  catch renamed/invented attributes before the user hits them at run time. Prefer a **small** fake
+  backend here regardless of which QPU the workload targets — this step checks option paths, and
+  mitigation now really runs locally (see below), so a 100+ qubit fake device buys nothing and can
+  exhaust memory.
   - **Always Cliffordize the circuit before running it in local mode.** A fake-backend run uses a
     statevector/noisy simulator, whose cost grows exponentially with qubit count and depth — a
     realistic workload circuit can hang or exhaust memory. Since the goal here is only to exercise
@@ -287,13 +290,27 @@ and mark verification as skipped rather than asserting the code works.
 does not exercise the real service path, so be precise about what a green run actually proves — do
 not over-claim:
 
-- **Error-mitigation options do not take effect locally, but their syntax IS validated.** Local
-  testing mode currently supports no error suppression or mitigation, so setting `twirling`,
-  `dynamical_decoupling`, `resilience`, etc. emits a `UserWarning` ("Options ... have no effect in
-  local testing mode"). That warning is expected and is not a migration failure — the run still
-  confirms the **option paths and value types are correct** (a renamed or invented attribute would
-  raise, not warn), which is exactly what this step is for. Report the warning as benign and note
-  that the mitigation's actual effect is only observable on hardware.
+- **Error suppression and mitigation DO take effect locally on the client-side primitives.** As of
+  0.50.0 the client-side (Executor-backed) primitives apply `twirling`, `dynamical_decoupling`, and
+  the `resilience` methods in local testing mode, so a fake-backend run exercises the mitigation
+  code path itself rather than only the option names (confirmed on 0.50.0: the same Bell-state `ZZ`
+  estimate on `FakeManilaV2` moves from `0.870` at `resilience_level=0` to `0.984` with
+  `zne_mitigation=True`, with **no warning emitted**). Three things still to be precise about:
+  - **It is not a prediction of hardware results.** A fake backend's calibration data is a one-time
+    snapshot of its real counterpart, and QPU noise drifts, so local numbers will not match what the
+    device returns. Report a green local run as evidence the code is correct, never as expected
+    hardware output.
+  - **Mitigation simulation costs memory.** The extra circuits (noise factors, twirling
+    randomizations) multiply the simulation, so a large fake backend can exhaust memory. When the
+    goal is only a syntax/option-path check, drop to a **small** fake backend (`FakeManilaV2`, 5
+    qubits) or a noiseless `AerSimulator`, and Cliffordize as below. On a noiseless backend, ZNE has
+    nothing to extrapolate from and warns "No positive, finite standard errors were found; falling
+    back to an unweighted fit" — benign, and expected there.
+  - **The deprecated server-side primitives still ignore these options locally.**
+    `qiskit_ibm_runtime.SamplerV2` / `EstimatorV2` on a fake backend emit `UserWarning: Options
+    {...} have no effect in local testing mode` and return the unmitigated value (confirmed on
+    0.50.0). Treat that warning as a **signal you are verifying pre-hop-B code**, not as benign: the
+    migration to the `executor_*` primitives is incomplete.
 - **`NoiseLearnerV3` has no local testing mode.** If your migration added an explicit noise-learning
   step (the guide's PEA/PEC section), you **cannot** run `NoiseLearnerV3` against a fake backend to
   verify it: its `mode` accepts only a real `Backend`, `Session`, or `Batch`, so there is no

@@ -33,6 +33,10 @@ You do if any of the following appear in your code:
 - `job.program_id`, a comparison against qiskit's `JobStatus` enum, `job.queue_info()`,
   `job.queue_usage()`, or `service.check_pending_jobs()`.
 - `backend.max_shots`, `backend.max_experiments`, `backend.max_circuits`, or `backend.defaults()`.
+- A retired cloud simulator: `ibmq_qasm_simulator`, `simulator_statevector`, `simulator_mps`,
+  `simulator_stabilizer`, or `simulator_extended_stabilizer`.
+- `qiskit.pulse`, a `ScheduleBlock`, `circuit.add_calibration(...)`, or an `RXCalibrationBuilder` /
+  `RZXCalibrationBuilder` pass.
 - A V1 fake backend (`FakeManila`, the old `FakeProvider`), or pulse-level access
   (`PulseDefaults`, `backend.drive_channel(...)`).
 - `.generators` / `.rates` read from a noise-learner result, or a `post_selection` option on
@@ -51,6 +55,8 @@ You do if any of the following appear in your code:
 | Execution | A primitive inside a session must use the session's backend | [One backend per session](#one-backend-per-session) |
 | Execution | `backend.run()` removed | [Running circuits](#running-circuits-backendrun--the-v2-primitives) |
 | Execution | Streaming and interim-result callbacks removed | [Result streaming](#result-streaming-and-interim-result-callbacks) |
+| Execution | Pulse gates rejected by the service since Feb 2025 | [Pulse gates](#pulse-gates-are-no-longer-supported) |
+| Execution | Pulse-level access removed | [Pulse-level access](#pulse-level-access) |
 | Programs | Custom runtime programs removed | [Custom runtime programs](#custom-runtime-programs) |
 | Programs | `RuntimeOptions` deprecated | [The `RuntimeOptions` class](#the-runtimeoptions-class) |
 | Jobs | `RuntimeJob` → `RuntimeJobV2`; `status()` returns a string | [Job objects](#job-objects-runtimejob--runtimejobv2-and-program_id--primitive_id) |
@@ -59,8 +65,8 @@ You do if any of the following appear in your code:
 | Options | `NoiseLearnerV3`'s `post_selection` renamed | [Noise learning](#noise-learning-post_selection--bit_flip_checkspost_circuit) |
 | Backend | `get_backend()` removed; `name` is now required | [Backend lookup](#backend-lookup-get_backend--backendname) |
 | Backend | `max_shots` / `max_experiments` / `max_circuits` gone | [Backend limits](#backend-limits-max_shots-max_experiments-max_circuits) |
+| Backend | Cloud simulators retired; simulate locally | [Cloud simulators](#cloud-simulators-are-retired-simulate-locally-run-on-a-qpu) |
 | Backend | V1 fake backends removed | [Fake V1 backends](#fake-v1-backends-and-fakeprovider) |
-| Backend | Pulse-level access removed | [Pulse-level access](#pulse-level-access) |
 
 ---
 
@@ -566,6 +572,63 @@ References:
 
 ---
 
+## Cloud simulators are retired: simulate locally, run on a QPU
+
+IBM Quantum cloud simulators were **retired on 15 May 2024**. The backend names no longer resolve —
+`service.backend(sim_name)` raises `QiskitBackendNotFoundError` if `sim_name` is one of
+`ibmq_qasm_simulator`, `simulator_statevector`, `simulator_mps`, `simulator_stabilizer`, or
+`simulator_extended_stabilizer`. Simulation now happens on
+your own machine.
+
+With `qiskit-ibm-runtime` 0.22.0 or later, you can use [local testing mode](https://quantum.cloud.ibm.com/docs/guides/local-testing-mode) to replace cloud simulators. To begin, specify one of the fake backends in `qiskit_ibm_runtime.fake_provider` or specify a Qiskit Aer backend when instantiating a primitive or a session.
+
+Since a primitive can take a backend object representing either a simulator or a real QPU, we suggest you put both paths in the code: simulate locally now, with the
+real QPU one uncomment away for when you are ready to spend QPU time:
+
+```python
+from qiskit_ibm_runtime import QiskitRuntimeService
+from qiskit_ibm_runtime.executor_sampler import Sampler
+from qiskit_ibm_runtime.fake_provider import FakeKingston
+
+service = QiskitRuntimeService()
+
+# Local simulation — runs now, costs no QPU time.
+backend = FakeKingston()
+
+# Real QPU — comment out the line above and uncomment this line when you are ready.
+# backend = service.backend("ibm_kingston")
+
+sampler = SamplerV2(mode=backend)   # identical either way
+```
+
+Picking the fake backend that matches the QPU you intend to use (`FakeKingston` for `ibm_kingston`, and so on) gives you the same qubit count, coupling map, and representative noise model but might fail execution if your local machine doesn't have enough memory for large-scale simulation. You can instead pick a smaller fake backend or use a Clifford simulator. See [Local testing mode](https://quantum.cloud.ibm.com/docs/guides/local-testing-mode) for more information.
+
+| # | Incompatible change | Migration action |
+| - | ------------------- | ---------------- |
+| 1 | `service.backend("ibmq_qasm_simulator")`, or any other retired simulator name | The name is gone. Replace it with a local simulator and add the real-QPU lines commented out, as above. |
+| 2 | `service.backends(simulator=True)`, or code that filtered the backend list for a simulator | There are no cloud simulators left to filter for. Choose a local simulator explicitly instead of discovering one. |
+| 3 | A workload that used the cloud simulator for **scale** rather than for a device's noise | A fake backend carries a real QPU's qubit count and noise model, which is the wrong tool for a large ideal run. Use `AerSimulator`, or stabilizer simulation for Clifford circuits at scale. |
+
+Since `qiskit-ibm-runtime` 0.50.0, the client-side primitives also apply your error suppression and
+mitigation options in local mode, so those code paths really run instead of being skipped. That is
+also extra simulation work — each noise factor and twirling randomization is another circuit to
+simulate — so if you are only checking that the code runs, a small fake backend or a noiseless Aer
+backend gets you there far more cheaply than a full-size device.
+
+The calibration data of a fake backend is a one-time snapshot of its real counterpart, and QPU noise
+drifts, so you should not treat local runs as a prediction of hardware results.
+
+Local testing mode requires `qiskit-ibm-runtime` **0.22.0 or later**; error suppression and
+mitigation in local mode require **0.50.0 or later** with the client-side primitives.
+
+References:
+
+- [Migrate to local simulators](https://quantum.cloud.ibm.com/docs/guides/local-simulators)
+- [Local testing mode](https://quantum.cloud.ibm.com/docs/guides/local-testing-mode)
+- [`fake_provider`](https://quantum.cloud.ibm.com/docs/api/qiskit-ibm-runtime/fake-provider)
+
+---
+
 ## Fake V1 backends and `FakeProvider`
 
 The `BackendV1`-based fake backends and the old `FakeProvider` were replaced by the V2 fake backends
@@ -615,6 +678,49 @@ References:
 
 ---
 
+## Pulse gates are no longer supported
+
+On **3 February 2025** pulse-level control was removed from all IBM Quantum processors: the service no
+longer accepts jobs that contain **pulse gates** — custom pulse calibrations attached to a circuit. Additionally, the `qiskit.pulse` module was deprecated in Qiskit SDK 1.3
+and **removed in Qiskit SDK 2.0**, along with `QuantumCircuit.add_calibration` and the
+calibration-builder transpiler passes.
+
+The most common use-case of pulse-level control was to build custom pulse schedules that modify the `ECR` or `RX` pulses to directly execute single- and two-qubit rotations. You can now accomplish this using **fractional gates** (RZZ and RX), which are built into the instruction set architecture (ISA).
+
+Request fractional gates when you get the backend:
+
+```python
+# Arbitrary-angle RZZ / RX as ISA instructions, no calibration of your own
+backend = service.backend("ibm_kingston", use_fractional_gates=True)
+
+# also available when letting the service choose
+backend = service.least_busy(operational=True, simulator=False, use_fractional_gates=True)
+```
+
+| # | Incompatible change | Migration action |
+| - | ------------------- | ---------------- |
+| 1 | `import qiskit.pulse`, `pulse.builder`, or a `ScheduleBlock` | Gone from both the service and the SDK. If the schedule implemented a single- or two-qubit rotation, express it with fractional gates. Anything else — custom pulse shapes, pulse-level characterization — has no drop-in replacement. |
+| 2 | `circuit.add_calibration(...)` attaching a pulse gate | The method no longer exists and the service would reject the circuit anyway. Use the fractional gate for that rotation. |
+| 3 | `RXCalibrationBuilder`, `RZXCalibrationBuilder`, or `RZXCalibrationBuilderNoEcho` in a pass manager | Remove the pass. Its purpose was to attach the calibration that fractional gates make unnecessary. |
+| 4 | An experiment that genuinely needs pulse-level control | This is a redesign, not an edit: Qiskit Dynamics is the remaining route, and it has no API in common with what you are replacing. Scope it as its own piece of work. |
+
+**None of this is a mechanical rewrite.** Fractional gates cover the simple rotation cases; beyond
+those, only you can judge whether the experiment survives the move. Expect to review every match by
+hand rather than accepting a diff.
+
+The removal of the pulse *API surface* from `qiskit-ibm-runtime` — `backend.defaults()`,
+`PulseBackendConfiguration`, and the channel accessors — is covered separately in
+[Pulse-level access](#pulse-level-access).
+
+References:
+
+- [Migrate from Qiskit Pulse to fractional gates](https://quantum.cloud.ibm.com/docs/guides/pulse-migration)
+- [Fractional gates](https://quantum.cloud.ibm.com/docs/guides/fractional-gates)
+- [IBM Quantum Compute Service changelog](https://quantum.cloud.ibm.com/docs/guides/changelog-quantum-compute-service)
+  (3 February 2025)
+
+---
+
 ## Pulse-level access
 
 Pulse-level access was removed from `qiskit-ibm-runtime` alongside the Qiskit 2.0 migration, because
@@ -634,7 +740,9 @@ pulse support was removed from Qiskit itself. There is **no replacement**.
 | 3 | `backend.drive_channel(...)`, `control_channel`, `measure_channel`, `acquire_channel` | Pulse channels do not exist. Code that built pulse schedules against them has to be re-expressed at the circuit and gate level. |
 
 If your work genuinely depended on pulse-level control, this is a redesign rather than a migration —
-and for some experiments the capability is simply no longer available through Qiskit.
+and for some experiments the capability is simply no longer available through Qiskit. For submitting
+pulse gates and the fractional-gate replacement, see
+[Pulse gates are no longer supported](#pulse-gates-are-no-longer-supported).
 
 References:
 

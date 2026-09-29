@@ -546,6 +546,45 @@ changes:
       `provider.runtime.run(program_id=...)`, dropping `.runtime` is cosmetic and the real
       migration is `custom-programs-removed`.
 
+  - id: cloud-simulators-retired
+    title: "IBM Quantum cloud simulators retired -> local simulator, with a commented-out real QPU"
+    domain: misc-deprecations
+    guide: .claude/skills/migrate-qiskit-ibm-runtime/migrate-non-primitive-apis.md   # section: "Cloud simulators are retired: simulate locally, run on a QPU"
+    status: active
+    code_evidence: code
+    applies_from: null
+    applies_to: null         # a SERVICE retirement (15 May 2024), not tied to a client release — trigger-driven
+    order: 1.7               # early: the execution target must be valid before the primitive/session changes are applied
+    # The five retired backend NAMES are decisive — they resolve on no current instance, so a
+    # match cannot be anything but pre-retirement code. `already_migrated` peels off code that
+    # already simulates locally (fake_provider / AerSimulator) before these match.
+    detect_primary:
+      - "ibmq_qasm_simulator"
+      - "simulator_statevector"
+      - "simulator_mps"
+      - "simulator_extended_stabilizer"
+      - "simulator_stabilizer"
+    detect_secondary:
+      - "simulator=True"             # backends(simulator=True) / least_busy(simulator=True) discovery
+      - "backends(simulator"
+    already_migrated:
+      - "fake_provider"
+      - "AerSimulator"
+    note: >
+      Apply the "Cloud simulators are retired: simulate locally, run on a QPU" section of the
+      guide. Retired 15 May 2024: the names
+      no longer resolve (`QiskitBackendNotFoundError`) and simulation moved to the user's machine.
+      THE ACTION IS NOT A ONE-FOR-ONE SWAP — write BOTH paths into the code: an active local
+      simulator AND the real-QPU lines COMMENTED OUT directly beneath, so the user only has to
+      uncomment when they are ready to spend QPU time. Say that in the report so they know the
+      commented lines are deliberate, not leftovers. Choose the `Fake*` backend matching the QPU
+      they intend to use, and keep `generate_preset_pass_manager(backend=backend, ...)` pointed at
+      the same variable so flipping the toggle also re-targets transpilation. Local testing mode
+      needs qiskit-ibm-runtime >= 0.22.0, and warn
+      that local numbers are a code check, not a hardware prediction. If the cloud simulator was
+      used for SCALE rather than device noise, a fake backend is the wrong replacement — flag
+      AerSimulator or stabilizer simulation instead.
+
   - id: execution-mode
     title: "Execution binding: backend=/session= -> mode=, backend-name strings & service= removed"
     domain: execution
@@ -843,4 +882,44 @@ changes:
       0.38.0) was removed in 0.41.0. There is NO replacement — pulse-level control is gone
       from Qiskit. Backends now return a `QasmBackendConfiguration` and the `Target` is
       built without pulse defaults. Flag every occurrence; a workload that genuinely needed
-      pulse control is a redesign, not a code edit.
+      pulse control is a redesign, not a code edit. Boundary: this entry is the CLIENT API
+      surface only — circuits that carry pulse gates are `pulse-gates-unsupported`.
+
+  - id: pulse-gates-unsupported
+    title: "Pulse gates no longer supported by the service (3 February 2025) -> fractional gates"
+    domain: misc-deprecations
+    guide: .claude/skills/migrate-qiskit-ibm-runtime/migrate-non-primitive-apis.md   # section: "Pulse gates are no longer supported"
+    status: active
+    code_evidence: code
+    applies_from: null
+    applies_to: null         # a SERVICE removal (3 February 2025), not tied to a client release — trigger-driven
+    order: 8.6               # immediately after pulse-surface-removed (8.5): same withdrawal, service side
+    # Substring care: "RZXCalibrationBuilder" also catches the "...NoEcho" variant, and does NOT
+    # contain "RXCalibrationBuilder" (RZX vs RX), so both names are needed. On a CURRENT stack these
+    # symbols raise ImportError/ModuleNotFoundError (qiskit.pulse, add_calibration and the
+    # calibration-builder passes all went in Qiskit SDK 2.0), so the code usually fails to import
+    # before the service ever sees it — do not report an ImportError here as an unrelated problem.
+    detect_primary:
+      - "qiskit.pulse"
+      - "pulse.builder"
+      - "ScheduleBlock"
+      - "add_calibration"
+      - "RXCalibrationBuilder"
+      - "RZXCalibrationBuilder"      # also matches RZXCalibrationBuilderNoEcho
+    detect_secondary:
+      - "calibration"                # broad — confirm it is a pulse calibration, not a calibration_id
+      - "Play("
+      - "Gaussian("
+    already_migrated:
+      - "use_fractional_gates"
+    note: >
+      Apply the "Pulse gates are no longer supported" section of the guide. On 3 February 2025 the
+      service stopped accepting PULSE GATES (custom calibrations attached to a submitted circuit);
+      the replacement is FRACTIONAL GATES, requested per backend with
+      `service.backend(name, use_fractional_gates=True)` (also valid on `least_busy`). NOT
+      MECHANICAL — do not offer an auto-apply diff: fractional gates cover only single- and
+      two-qubit rotations, and anything beyond that (custom pulse shapes, pulse-level
+      characterization) has no drop-in and means Qiskit Dynamics, i.e. a redesign the user has to
+      scope. Flag every match for human review and say which bucket you think it falls in. Boundary:
+      the removal of the pulse API surface (`backend.defaults()`, `PulseBackendConfiguration`,
+      channel accessors) is `pulse-surface-removed`.
