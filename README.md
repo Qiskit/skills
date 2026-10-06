@@ -11,7 +11,7 @@ A collection of [Agent Skills](https://www.anthropic.com/engineering/equipping-a
 
 Skills are contextual and auto-loaded based on your conversation. When a request matches a skill's triggers, the agent loads and applies the relevant skill to provide accurate, grounded guidance rather than relying on general knowledge that may be outdated.
 
-Skills are added and improved continuously, so check back for updates. See the [Roadmap](#skills-roadmap) for what is planned next.
+Skills are added and improved continuously, so check back for updates. See the [Skills roadmap](#skills-roadmap) for what is planned next.
 
 The currently available skills are:
 
@@ -86,7 +86,7 @@ If your agent does not support a native plugin or the skills CLI, clone this rep
 | Cursor | `~/.cursor/skills/` | [docs](https://cursor.com/docs/context/skills)
 | IBM Bob | `.bob/skills/` | [docs](https://bob.ibm.com/docs/ide/features/skills)
 
-## Skills Roadmap
+## Skills roadmap
 
 Disclaimer: This roadmap is intended to provide guidance and does not constitute a contractual commitment.
 
