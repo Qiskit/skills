@@ -11,6 +11,10 @@ A collection of [Agent Skills](https://www.anthropic.com/engineering/equipping-a
 
 Skills are contextual and auto-loaded based on your conversation. When a request matches a skill's triggers, the agent loads and applies the relevant skill to provide accurate, grounded guidance rather than relying on general knowledge that may be outdated.
 
+Skills are added and improved continuously, so check back for updates. See the [Roadmap](#skills-roadmap) for what is planned next.
+
+The currently available skills are:
+
 | Skill | Useful for |
 |-------|------------|
 | `migrate-qiskit-ibm-runtime` | Migrating qiskit-ibm-runtime code from an older release to the most recent one. |
@@ -82,6 +86,18 @@ If your agent does not support a native plugin or the skills CLI, clone this rep
 | Cursor | `~/.cursor/skills/` | [docs](https://cursor.com/docs/context/skills)
 | IBM Bob | `.bob/skills/` | [docs](https://bob.ibm.com/docs/ide/features/skills)
 
+## Skills Roadmap
+
+Disclaimer: This roadmap is intended to provide guidance and does not constitute a contractual commitment.
+
+- ✅ `qiskit-ibm-runtime` code migration (Q3 2026)
+- 🚧 Error mitigation methods accuracy/cost evaluation  (Q4 2026)
+- Problem-aware layout selection (Q4 2026)
+- Circuit optimization for hardware execution (2027)
+- Qiskit code migration (2027)
+- Performance optimization for IBM Quantum hardware execution (2027)
+- Domain-specific problem mapping (2027)
+- Quantum workflow planning
 
 ## Contributing
 
