@@ -1,5 +1,5 @@
 ---
-name: qiskit-fermions
+name: simulate-fermionic-systems
 description: Guide for simulating fermionic systems (molecules, Hubbard/Anderson/impurity models, lattice fermions, any second-quantized Hamiltonian) on quantum computers with the qiskit-fermions package — building fermionic operators and circuits, choosing, comparing and implementing fermion-to-qubit encodings (Jordan-Wigner, ternary-tree, custom), transpiling fermionic circuits with fermionic-level optimizations (term grouping, Trotterization, orbital rotations), and verifying with ffsim. Use this skill whenever the user wants to put electrons or other fermions onto qubits, time-evolve or Trotterize a fermionic Hamiltonian, reduce Trotter depth, transpile an LUCJ/UCJ/UCC ansatz, compare or implement encodings, or compute ground-state energies with a quantum workflow (typically sample-based diagonalization) — even if they never mention qiskit-fermions and only say "mapping a Hamiltonian to qubits", "Jordan-Wigner", "second quantization in Qiskit", or "simulate this molecule on a quantum computer".
 ---
 
