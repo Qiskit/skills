@@ -151,6 +151,6 @@ PNA uses the Executor primitive and is incompatible with the EstimatorV2 options
 
 TREX is the natural complement for readout noise: after executing via Executor, apply `trex_factors` from `qiskit_addon_utils.noise_management` to rescale the expectation values using the learned measurement noise model. Dynamical decoupling can be applied to the ISA circuit before boxing, and is compatible at the circuit level.
 
-Post-selection on non-Markovian error checks ([`postselection-non-markovian`](postselection-non-markovian.md)) is commonly used alongside PNA in the full workflow to discard non-Markovian shots, as demonstrated in the tutorial.
+Post-selection on non-Markovian error checks ([`postselection-non-markovian`](./postselection-non-markovian.md)) is commonly used alongside PNA in the full workflow to discard non-Markovian shots, as demonstrated in the tutorial.
 
 Anecdotally, PNA's QPU cost can be lower than ZNE-PEA's in some regimes, since PNA carries no noise-amplification shot overhead — but this comparison is workload-dependent and has not been quantified here; treat it as a hypothesis to validate empirically rather than a decision rule.
