@@ -37,7 +37,7 @@ things the user may want next, not in place of them. A request too ambiguous to 
 qiskit-fermions is not installed, install the latest release (`pip install "qiskit-fermions[ffsim]"`,
 prebuilt wheels). Do not replace a development build with a release, and do not install one
 yourself unless the user asks; it compiles a Rust extension from source. Add other packages when the
-route calls for them (the SQD tooling, `qiskit-ibm-runtime`), not up front. Never use or mix in
+route calls for them (the SQD tooling, `qiskit-ibm-runtime`, etc), not up front. Never use or mix in
 `qiskit-nature`: it is not actively developed and uses different conventions.
 
 Have every script print the versions of `qiskit`, `qiskit-fermions` and `ffsim` at the top of its
