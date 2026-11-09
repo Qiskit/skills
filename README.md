@@ -19,6 +19,7 @@ The currently available skills are:
 |-------|------------|
 | `migrate-qiskit-ibm-runtime` | Migrating qiskit-ibm-runtime code from an older release to the most recent one. |
 | `select-error-mitigation` | Select and configure an error mitigation/suppression strategy for your quantum workloads. |
+| `simulate-fermionic-systems` | Simulating fermionic systems on quantum computers with the `qiskit-fermions` package. |
 
 ## Installation
 
