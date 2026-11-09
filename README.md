@@ -18,6 +18,7 @@ The currently available skills are:
 | Skill | Useful for |
 |-------|------------|
 | `migrate-qiskit-ibm-runtime` | Migrating qiskit-ibm-runtime code from an older release to the most recent one. |
+| `simulate-fermionic-systems` | Simulating fermionic systems on quantum computers with the `qiskit-fermions` package. |
 
 ## Installation
 
