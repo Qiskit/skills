@@ -18,7 +18,9 @@ The currently available skills are:
 | Skill | Useful for |
 |-------|------------|
 | `migrate-qiskit-ibm-runtime` | Migrating qiskit-ibm-runtime code from an older release to the most recent one. |
+| `select-error-mitigation` | Select and configure an error mitigation/suppression strategy for your quantum workloads. |
 | `select-sqd-eigensolver` | Selecting an eigensolver for use in sample-based quantum diagonalization (SQD) calculations. |
+| `simulate-fermionic-systems` | Simulating fermionic systems on quantum computers with the `qiskit-fermions` package. |
 
 ## Installation
 
@@ -92,7 +94,7 @@ If your agent does not support a native plugin or the skills CLI, clone this rep
 Disclaimer: This roadmap is intended to provide guidance and does not constitute a contractual commitment.
 
 - ✅ `qiskit-ibm-runtime` code migration (Q3 2026)
-- 🚧 Error mitigation methods accuracy/cost evaluation  (Q4 2026)
+- ✅ Error mitigation methods accuracy/cost evaluation  (Q4 2026)
 - Problem-aware layout selection (Q4 2026)
 - Circuit optimization for hardware execution (2027)
 - Qiskit code migration (2027)
