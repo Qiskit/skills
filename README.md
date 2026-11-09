@@ -18,6 +18,7 @@ The currently available skills are:
 | Skill | Useful for |
 |-------|------------|
 | `migrate-qiskit-ibm-runtime` | Migrating qiskit-ibm-runtime code from an older release to the most recent one. |
+| `select-sqd-eigensolver` | Selecting an eigensolver for use in sample-based quantum diagonalization (SQD) calculations. |
 
 ## Installation
 
