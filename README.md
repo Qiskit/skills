@@ -18,6 +18,7 @@ The currently available skills are:
 | Skill | Useful for |
 |-------|------------|
 | `migrate-qiskit-ibm-runtime` | Migrating qiskit-ibm-runtime code from an older release to the most recent one. |
+| `select-error-mitigation` | Select and configure an error mitigation/suppression strategy for your quantum workloads. |
 
 ## Installation
 
