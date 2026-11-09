@@ -91,7 +91,7 @@ If your agent does not support a native plugin or the skills CLI, clone this rep
 Disclaimer: This roadmap is intended to provide guidance and does not constitute a contractual commitment.
 
 - ✅ `qiskit-ibm-runtime` code migration (Q3 2026)
-- 🚧 Error mitigation methods accuracy/cost evaluation  (Q4 2026)
+- ✅ Error mitigation methods accuracy/cost evaluation  (Q4 2026)
 - Problem-aware layout selection (Q4 2026)
 - Circuit optimization for hardware execution (2027)
 - Qiskit code migration (2027)
