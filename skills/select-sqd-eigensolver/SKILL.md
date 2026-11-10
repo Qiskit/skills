@@ -113,7 +113,7 @@ What matters:
 1. **The system** — roughly how many spatial orbitals and electrons, and
    whether the active space is likely to grow.
 2. **What they need out of the diagonalization** — the energy alone, or also
-   RDMs (for embedding or fragmentation), excited states, or control over spin.
+   Reduced Density Matrices (RDMs) for embedding or fragmentation, excited states, or control over spin.
 3. **What is going wrong now**, if anything. "Too slow" and "runs out of
    memory" point in different directions.
 
