@@ -144,6 +144,7 @@ The local profile is rough by design; the deployed function is where the researc
 - **If `cores_used` is far below `cores_granted`**, the extra cores came with the memory, not because they help — that is fine, but no reason to climb for cores alone. If the runs keep the cores busy, `python mw_sweep.py compare <tier> <smaller> <larger>` (two CPU profile ids from `compute_profiles()`) runs the same tier on both and shows what more cores buy (multithreaded kernels and worker pools often give well under 2× for 2× the cores, and pools sized from the core count use more memory).
 - **Add comparison runs where it is unclear** — the same problem on two neighbouring profiles, or a CPU and a GPU profile — to see what more cores or a GPU actually buy.
 - **Update `sizes_map`** from what the runs showed, not from the local estimate.
+- **Fill `size_calculator.py` from the same fit**, so the researcher can pick `function_size` per problem before submitting, and the job stops itself if the size is too small. Take its cutoffs from measured runs (`FIT` from `scale_probe.json`), never from the formula alone. `python size_calculator.py runs.json` confirms that no measured run would have been given a machine smaller than it used.
 
 A useful first experiment is the same problem on two or three profiles, comparing `wall_s` and `stages` from each result.
 

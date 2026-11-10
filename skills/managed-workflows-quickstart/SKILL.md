@@ -47,7 +47,7 @@ my_workflow/
   <their modules>.py   # unchanged where possible
 ```
 
-Copy `mw_telemetry.py` from this folder into the same folder. The entrypoint imports their code, reads the arguments, wraps the run in `telemetry()`, and returns a dict:
+Copy `mw_telemetry.py` and `size_calculator.py` from this folder into the same folder (the calculator is filled in at the end of Step 4; until then its check only logs). The entrypoint imports their code, reads the arguments, wraps the run in `telemetry()`, and returns a dict:
 
 ```python
 import traceback
@@ -57,6 +57,7 @@ from qiskit_serverless import install_uploaded_wheels
 install_uploaded_wheels()                      # extra packages (see below); a no-op without wheels
 
 from mw_telemetry import telemetry
+from size_calculator import validate_size
 from my_module import run_my_workflow          # their code
 
 
@@ -64,6 +65,7 @@ def run_function(backend_name=None, alloc_check=None, **args):
     backend = get_runtime_service().backend(backend_name) if backend_name else None
     result = None
     with telemetry(alloc_check=alloc_check) as t:  # peak memory, cores used, heartbeat in the logs
+        validate_size(**args)                      # stops a job whose size is too small (Step 4)
         update_status(Job.POST_PROCESSING)         # pick the label per stage: MAPPING, OPTIMIZING_HARDWARE,
         with t.stage("workflow"):                  # WAITING_QPU, EXECUTING_QPU, POST_PROCESSING
             result = run_my_workflow(backend=backend, **args)
@@ -169,3 +171,19 @@ Every number you report must come from a real job: quote its `job_id` and the `m
 If run time grows faster than expected, check the heartbeat in `job.logs()` before the next size. A 24-hour job that is 10× slower than planned should be split or extended, not resubmitted; the limit counts execution time, and `update_status(...)` calls do not reset it.
 
 Keep going until something stops them; that is the interesting result. Then update `sizes_map` from what the runs showed, and keep `runs.json` with their code.
+
+**Hand them a size calculator.** `sizes_map` says what each label is; the researcher still needs to know which label a given problem needs. Fill the edit block of `size_calculator.py`:
+- `MEMORY_GB`: copy it from `scale_probe.py`.
+- `FIT`: copy it from `fit` in `scale_probe.json`.
+- `SIZES`: the memory of each label's profile in `sizes_map`.
+- `DEFAULTS`: any argument defaults the formula reads.
+- Set `FILLED = True`.
+
+Then run `python size_calculator.py runs.json`. It must say `ok` for every measured run, and it prints the label for each tier. Re-upload, and show them the two lines they use before each submission:
+
+```python
+from size_calculator import calculate_function_size   # the same file as in the function folder
+job = fn.run(function_size=calculate_function_size(**args), **args)
+```
+
+The calculator needs only the standard library, so it runs in their notebook. Inside the job, `validate_size` stops a job whose size is too small before it runs out of memory, and records an event in `job.events()` when the size is larger than needed. A problem past the largest label gets that label with a warning, just as the climb tries the largest profile. Re-fill the calculator and re-upload whenever `sizes_map` or the fit changes.

@@ -317,7 +317,15 @@ def size(runs):
         print("  -", note)
     with open(os.path.join(HERE, "scale_probe.json"), "w", encoding="utf-8") as handle:
         json.dump(
-            {"tiers": rows, "notes": list(dict.fromkeys(notes))}, handle, indent=1, default=str
+            {
+                "fit": {"base": round(mem["base"], 4), "k": round(mem["k"], 4)},
+                "headroom": HEADROOM,
+                "tiers": rows,
+                "notes": list(dict.fromkeys(notes)),
+            },
+            handle,
+            indent=1,
+            default=str,
         )
     return rows
 
