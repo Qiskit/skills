@@ -17,6 +17,7 @@ The currently available skills are:
 
 | Skill | Useful for |
 |-------|------------|
+| `managed-workflows-quickstart` | Running a local workflow that has outgrown your machine on IBM Quantum Managed Workflows: sizing, wrapping, deploying and scaling it up. |
 | `migrate-qiskit-ibm-runtime` | Migrating qiskit-ibm-runtime code from an older release to the most recent one. |
 | `select-error-mitigation` | Select and configure an error mitigation/suppression strategy for your quantum workloads. |
 | `select-sqd-eigensolver` | Selecting an eigensolver for use in sample-based quantum diagonalization (SQD) calculations. |
