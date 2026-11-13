@@ -62,6 +62,9 @@ Install using the [plugin marketplace](https://code.claude.com/docs/en/discover-
 /plugin install qiskit-ai-skills@qiskit
 ```
 
+> [!TIP]
+> Claude Code does not enable automatic updates for third-party marketplaces by default. To receive new and improved skills automatically, run `/plugin`, go to the **Marketplaces** tab, select `qiskit`, and choose **Enable auto-update**. Otherwise, update manually with **Update marketplace** in that same view.
+
 #### Codex
 
 ```
